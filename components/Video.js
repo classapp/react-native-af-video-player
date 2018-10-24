@@ -89,7 +89,7 @@ class Video extends Component {
 
     const { currentTime, duration } = this.state;
 
-    if (trimming && (prevProps.startTime !== startTime || prevProps.endTime !== endTime)) {
+    if (!!trimming && (prevProps.startTime !== startTime || prevProps.endTime !== endTime)) {
       let seek;
       if (startTime > currentTime) {
         seek = (startTime / duration);
@@ -147,8 +147,8 @@ class Video extends Component {
     const { duration } = this.state;
 
     if (!loop) this.pause()
-    this.onSeekRelease(trimming ? (startTime / this.state.duration) : 0)
-    this.setState({ currentTime: trimming ? startTime : 0 }, () => {
+    this.onSeekRelease(!!trimming ? (startTime / this.state.duration) : 0)
+    this.setState({ currentTime: !!trimming ? startTime : 0 }, () => {
       if (!loop) this.controls.showControls()
     })
   }
@@ -323,10 +323,10 @@ class Video extends Component {
     const { duration } = this.state
 
     // const progress = (currentTime + this.props.startTime) / (this.props.endTime - this.props.startTime)
-    const ratio = trimming ? (currentTime - startTime) / (endTime - startTime) : (currentTime / duration);
+    const ratio = !!trimming ? (currentTime - startTime) / (endTime - startTime) : (currentTime / duration);
     const progress = Math.max(0, ratio);
 
-    if (trimming && (currentTime >= this.props.endTime)) {
+    if (!!trimming && (currentTime >= this.props.endTime)) {
       this.onEnd()
       return
     }
@@ -459,8 +459,8 @@ class Video extends Component {
           onMorePress={() => onMorePress()}
           theme={setTheme}
           inlineOnly={inlineOnly}
-          startTime={trimming ? startTime : undefined}
-          endTime={trimming ? endTime : undefined}
+          startTime={!!trimming ? startTime : undefined}
+          endTime={!!trimming ? endTime : undefined}
         />
       </Animated.View>
     )
