@@ -527,7 +527,7 @@ Video.defaultProps = {
   playWhenInactive: false,
   rotateToFullScreen: false,
   lockPortraitOnFsExit: false,
-  trimming: false,
+  trimming: undefined,
   onEnd: () => { },
   onLoad: () => { },
   onPlay: () => { },
