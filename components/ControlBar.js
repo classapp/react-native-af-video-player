@@ -33,8 +33,8 @@ const ControlBar = (props) => {
     <LinearGradient colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.75)']} style={styles.container}>
       <Time time={currentTime - (startTime || 0)} theme={theme.seconds} />
       <Scrubber
-        onSeek={pos => onSeek(!!trimming ? (((pos * (endTime - startTime)) + startTime) / duration): pos}
-        onSeekRelease={pos => onSeekRelease(!!trimming ? (((pos * (endTime - startTime)) + startTime) / duration): pos}
+        onSeek={pos => onSeek(!!trimming ? (((pos * (endTime - startTime)) + startTime) / duration): pos)}
+        onSeekRelease={pos => onSeekRelease(!!trimming ? (((pos * (endTime - startTime)) + startTime) / duration): pos)}
         progress={progress}
         theme={{ scrubberThumb: theme.scrubberThumb, scrubberBar: theme.scrubberBar }}
       />
