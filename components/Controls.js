@@ -167,8 +167,8 @@ class Controls extends Component {
             duration={duration}
             theme={controlBar}
             inlineOnly={inlineOnly}
-            startTime={trimming ? startTime : undefined}
-            endTime={trimming ? endTime : undefined}
+            startTime={!!trimming ? startTime : undefined}
+            endTime={!!trimming ? endTime : undefined}
             trimming={trimming}
           />
         </Animated.View>

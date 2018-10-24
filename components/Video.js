@@ -147,7 +147,7 @@ class Video extends Component {
     const { duration } = this.state;
 
     if (!loop) this.pause()
-    this.onSeekRelease(!!trimming ? (startTime / this.state.duration) : 0)
+    this.onSeekRelease(!!trimming ? (startTime / duration) : 0)
     this.setState({ currentTime: !!trimming ? startTime : 0 }, () => {
       if (!loop) this.controls.showControls()
     })
@@ -322,11 +322,10 @@ class Video extends Component {
     const { trimming, startTime, endTime } = this.props;
     const { duration } = this.state
 
-    // const progress = (currentTime + this.props.startTime) / (this.props.endTime - this.props.startTime)
-    const ratio = !!trimming ? (currentTime - startTime) / (endTime - startTime) : (currentTime / duration);
+    const ratio = !!trimming ? ((currentTime - startTime) / (endTime - startTime)) : (currentTime / duration);
     const progress = Math.max(0, ratio);
 
-    if (!!trimming && (currentTime >= this.props.endTime)) {
+    if (!!trimming && (currentTime >= endTime)) {
       this.onEnd()
       return
     }
@@ -461,6 +460,7 @@ class Video extends Component {
           inlineOnly={inlineOnly}
           startTime={!!trimming ? startTime : undefined}
           endTime={!!trimming ? endTime : undefined}
+          trimming={trimming}
         />
       </Animated.View>
     )

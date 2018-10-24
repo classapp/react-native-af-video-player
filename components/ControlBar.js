@@ -47,7 +47,7 @@ const ControlBar = (props) => {
         iconOn="volume-mute"
         size={20}
       />
-      <Time time={trimming ? duration : (endTime - startTime)} theme={theme.duration} />
+      <Time time={!!trimming ? (endTime - startTime) : duration} theme={theme.duration} />
       {!inlineOnly &&
         <ToggleIcon
           paddingRight
