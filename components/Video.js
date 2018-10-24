@@ -84,27 +84,21 @@ class Video extends Component {
 
   componentDidUpdate(prevProps) {
     const {
-      startTime, endTime,
+      trimming, startTime, endTime,
     } = this.props;
 
     const { currentTime, duration } = this.state;
 
-    if (prevProps.startTime !== startTime || prevProps.endTime !== endTime) {
+    if (trimming && (prevProps.startTime !== startTime || prevProps.endTime !== endTime)) {
       let seek;
-      // let time;
       if (startTime > currentTime) {
         seek = (startTime / duration);
-        // time = Math.max(0, startTime);
       } else if (endTime < currentTime) {
         seek = (endTime / duration);
-        // time = Math.min(endTime, duration);
       } else {
-        // time = currentTime;
         seek = (currentTime / duration)
       }
-      // console.warn('seek', currentTime, startTime)
       this.onSeekRelease(seek);
-      // this.progress({ currentTime: time });
     }
   }
 
@@ -149,10 +143,12 @@ class Video extends Component {
 
   onEnd() {
     this.props.onEnd()
-    const { loop, startTime } = this.props
+    const { loop, startTime, trimming } = this.props
+    const { duration } = this.state;
+
     if (!loop) this.pause()
-    this.onSeekRelease(startTime / this.state.duration)
-    this.setState({ currentTime: startTime }, () => {
+    this.onSeekRelease(trimming ? (startTime / this.state.duration) : 0)
+    this.setState({ currentTime: trimming ? startTime : 0 }, () => {
       if (!loop) this.controls.showControls()
     })
   }
@@ -187,11 +183,7 @@ class Video extends Component {
   }
 
   onSeekRelease(percent) {
-    const { startTime, endTime } = this.props
     const seconds = percent * this.state.duration
-    // const seconds = percent * (this.props.endTime - this.props.startTime)
-    // const progress = (seconds - startTime) / (endTime - startTime)
-    // console.warn(seconds, percent, this.state.duration);
 
     this.setState({ seeking: false }, () => {
       this.progress({ currentTime: Math.max(0, seconds) })
@@ -327,11 +319,14 @@ class Video extends Component {
 
   progress(time) {
     const { currentTime } = time
+    const { trimming, startTime, endTime } = this.props;
+    const { duration } = this.state
+
     // const progress = (currentTime + this.props.startTime) / (this.props.endTime - this.props.startTime)
-    const ratio = (currentTime - this.props.startTime) / (this.props.endTime - this.props.startTime)
+    const ratio = trimming ? (currentTime - startTime) / (endTime - startTime) : (currentTime / duration);
     const progress = Math.max(0, ratio);
 
-    if (currentTime >= this.props.endTime) {
+    if (trimming && (currentTime >= this.props.endTime)) {
       this.onEnd()
       return
     }
@@ -394,7 +389,8 @@ class Video extends Component {
       playInBackground,
       playWhenInactive,
       startTime,
-      endTime
+      endTime,
+      trimming,
     } = this.props
 
     const inline = {
@@ -463,8 +459,8 @@ class Video extends Component {
           onMorePress={() => onMorePress()}
           theme={setTheme}
           inlineOnly={inlineOnly}
-          startTime={startTime}
-          endTime={endTime}
+          startTime={trimming ? startTime : undefined}
+          endTime={trimming ? endTime : undefined}
         />
       </Animated.View>
     )
@@ -515,7 +511,8 @@ Video.propTypes = {
   logo: PropTypes.string,
   title: PropTypes.string,
   theme: PropTypes.object,
-  resizeMode: PropTypes.string
+  resizeMode: PropTypes.string,
+  trimming: PropTypes.bool,
 }
 
 Video.defaultProps = {
@@ -530,6 +527,7 @@ Video.defaultProps = {
   playWhenInactive: false,
   rotateToFullScreen: false,
   lockPortraitOnFsExit: false,
+  trimming: false,
   onEnd: () => { },
   onLoad: () => { },
   onPlay: () => { },

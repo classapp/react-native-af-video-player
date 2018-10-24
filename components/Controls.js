@@ -129,7 +129,8 @@ class Controls extends Component {
       theme,
       inlineOnly,
       startTime,
-      endTime
+      endTime,
+      trimming
     } = this.props
 
     const { center, ...controlBar } = theme
@@ -166,8 +167,9 @@ class Controls extends Component {
             duration={duration}
             theme={controlBar}
             inlineOnly={inlineOnly}
-            startTime={startTime}
-            endTime={endTime}
+            startTime={trimming ? startTime : undefined}
+            endTime={trimming ? endTime : undefined}
+            trimming={trimming}
           />
         </Animated.View>
       </Touchable>
