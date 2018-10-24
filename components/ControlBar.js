@@ -23,15 +23,17 @@ const ControlBar = (props) => {
     muted,
     fullscreen,
     theme,
-    inlineOnly
+    inlineOnly,
+    startTime,
+    endTime
   } = props
 
   return (
     <LinearGradient colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.75)']} style={styles.container}>
-      <Time time={currentTime} theme={theme.seconds} />
+      <Time time={currentTime - (startTime || 0)} theme={theme.seconds} />
       <Scrubber
-        onSeek={pos => onSeek(pos)}
-        onSeekRelease={pos => onSeekRelease(pos)}
+        onSeek={pos => onSeek(((pos * (endTime - startTime)) + startTime) / duration)}
+        onSeekRelease={pos => onSeekRelease(((pos * (endTime - startTime)) + startTime) / duration)}
         progress={progress}
         theme={{ scrubberThumb: theme.scrubberThumb, scrubberBar: theme.scrubberBar }}
       />
@@ -44,16 +46,16 @@ const ControlBar = (props) => {
         iconOn="volume-mute"
         size={20}
       />
-      <Time time={duration} theme={theme.duration} />
-      { !inlineOnly &&
-      <ToggleIcon
-        paddingRight
-        onPress={() => props.toggleFS()}
-        iconOff="fullscreen"
-        iconOn="fullscreen-exit"
-        isOn={fullscreen}
-        theme={theme.fullscreen}
-      />}
+      <Time time={endTime - startTime} theme={theme.duration} />
+      {!inlineOnly &&
+        <ToggleIcon
+          paddingRight
+          onPress={() => props.toggleFS()}
+          iconOff="fullscreen"
+          iconOn="fullscreen-exit"
+          isOn={fullscreen}
+          theme={theme.fullscreen}
+        />}
     </LinearGradient>
   )
 }

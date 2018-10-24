@@ -49,7 +49,7 @@ const TopBar = (props) => {
   return (
     <LinearGradient colors={['rgba(0,0,0,0.75)', 'rgba(0,0,0,0)']} style={styles.container}>
       <View style={styles.row}>
-        { logo && <Image style={styles.logo} resizeMode="contain" {...checkSource(logo)} />}
+        {logo && <Image style={styles.logo} resizeMode="contain" {...checkSource(logo)} />}
         <Text
           style={[styles.title, { color: theme.title }]}
           numberOfLines={1}
@@ -57,7 +57,7 @@ const TopBar = (props) => {
         >
           {title}
         </Text>
-        { more &&
+        {more &&
           <ToggleIcon
             style={styles.more}
             onPress={() => onMorePress()}
@@ -75,7 +75,7 @@ const TopBar = (props) => {
 
 TopBar.propTypes = {
   title: PropTypes.string.isRequired,
-  logo: PropTypes.string.isRequired,
+  logo: PropTypes.string,
   more: PropTypes.bool.isRequired,
   onMorePress: PropTypes.func.isRequired,
   theme: PropTypes.object.isRequired

@@ -82,6 +82,32 @@ class Video extends Component {
     BackHandler.removeEventListener('hardwareBackPress', this.BackHandler)
   }
 
+  componentDidUpdate(prevProps) {
+    const {
+      startTime, endTime,
+    } = this.props;
+
+    const { currentTime, duration } = this.state;
+
+    if (prevProps.startTime !== startTime || prevProps.endTime !== endTime) {
+      let seek;
+      // let time;
+      if (startTime > currentTime) {
+        seek = (startTime / duration);
+        // time = Math.max(0, startTime);
+      } else if (endTime < currentTime) {
+        seek = (endTime / duration);
+        // time = Math.min(endTime, duration);
+      } else {
+        // time = currentTime;
+        seek = (currentTime / duration)
+      }
+      // console.warn('seek', currentTime, startTime)
+      this.onSeekRelease(seek);
+      // this.progress({ currentTime: time });
+    }
+  }
+
   onLoadStart() {
     this.setState({ paused: true, loading: true })
   }
@@ -89,7 +115,7 @@ class Video extends Component {
   onLoad(data) {
     if (!this.state.loading) return
     this.props.onLoad(data)
-    const { height, width } = data.naturalSize   
+    const { height, width } = data.naturalSize
     const ratio = height === 'undefined' && width === 'undefined' ?
       (9 / 16) : (height / width)
     const inlineHeight = this.props.lockRatio ?
@@ -123,10 +149,10 @@ class Video extends Component {
 
   onEnd() {
     this.props.onEnd()
-    const { loop } = this.props
+    const { loop, startTime } = this.props
     if (!loop) this.pause()
-    this.onSeekRelease(0)
-    this.setState({ currentTime: 0 }, () => {
+    this.onSeekRelease(startTime / this.state.duration)
+    this.setState({ currentTime: startTime }, () => {
       if (!loop) this.controls.showControls()
     })
   }
@@ -161,8 +187,14 @@ class Video extends Component {
   }
 
   onSeekRelease(percent) {
+    const { startTime, endTime } = this.props
     const seconds = percent * this.state.duration
-    this.setState({ progress: percent, seeking: false }, () => {
+    // const seconds = percent * (this.props.endTime - this.props.startTime)
+    // const progress = (seconds - startTime) / (endTime - startTime)
+    // console.warn(seconds, percent, this.state.duration);
+
+    this.setState({ seeking: false }, () => {
+      this.progress({ currentTime: Math.max(0, seconds) })
       this.player.seek(seconds)
     })
   }
@@ -242,9 +274,9 @@ class Video extends Component {
           const initialOrient = Orientation.getInitialOrientation()
           const height = orientation !== initialOrient ?
             Win.width : Win.height
-            this.props.onFullScreen(this.state.fullScreen)
-            if (this.props.rotateToFullScreen) Orientation.lockToLandscape()
-            this.animToFullscreen(height)
+          this.props.onFullScreen(this.state.fullScreen)
+          if (this.props.rotateToFullScreen) Orientation.lockToLandscape()
+          this.animToFullscreen(height)
         } else {
           if (this.props.fullScreenOnly) {
             this.setState({ paused: true }, () => this.props.onPlay(!this.state.paused))
@@ -280,7 +312,7 @@ class Video extends Component {
   }
 
   seek(percent) {
-    const currentTime = percent * this.state.duration
+    const currentTime = (percent * this.state.duration)
     this.setState({ seeking: true, currentTime })
   }
 
@@ -295,7 +327,15 @@ class Video extends Component {
 
   progress(time) {
     const { currentTime } = time
-    const progress = currentTime / this.state.duration
+    // const progress = (currentTime + this.props.startTime) / (this.props.endTime - this.props.startTime)
+    const ratio = (currentTime - this.props.startTime) / (this.props.endTime - this.props.startTime)
+    const progress = Math.max(0, ratio);
+
+    if (currentTime >= this.props.endTime) {
+      this.onEnd()
+      return
+    }
+
     if (!this.state.seeking) {
       this.setState({ progress, currentTime }, () => {
         this.props.onProgress(time)
@@ -352,7 +392,9 @@ class Video extends Component {
       onMorePress,
       inlineOnly,
       playInBackground,
-      playWhenInactive
+      playWhenInactive,
+      startTime,
+      endTime
     } = this.props
 
     const inline = {
@@ -421,6 +463,8 @@ class Video extends Component {
           onMorePress={() => onMorePress()}
           theme={setTheme}
           inlineOnly={inlineOnly}
+          startTime={startTime}
+          endTime={endTime}
         />
       </Animated.View>
     )
@@ -486,14 +530,14 @@ Video.defaultProps = {
   playWhenInactive: false,
   rotateToFullScreen: false,
   lockPortraitOnFsExit: false,
-  onEnd: () => {},
-  onLoad: () => {},
-  onPlay: () => {},
-  onError: () => {},
-  onProgress: () => {},
+  onEnd: () => { },
+  onLoad: () => { },
+  onPlay: () => { },
+  onError: () => { },
+  onProgress: () => { },
   onMorePress: undefined,
-  onFullScreen: () => {},
-  onTimedMetadata: () => {},
+  onFullScreen: () => { },
+  onTimedMetadata: () => { },
   rate: 1,
   volume: 1,
   lockRatio: undefined,

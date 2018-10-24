@@ -127,7 +127,9 @@ class Controls extends Component {
       currentTime,
       duration,
       theme,
-      inlineOnly
+      inlineOnly,
+      startTime,
+      endTime
     } = this.props
 
     const { center, ...controlBar } = theme
@@ -164,6 +166,8 @@ class Controls extends Component {
             duration={duration}
             theme={controlBar}
             inlineOnly={inlineOnly}
+            startTime={startTime}
+            endTime={endTime}
           />
         </Animated.View>
       </Touchable>
@@ -196,7 +200,7 @@ Controls.propTypes = {
   currentTime: PropTypes.number.isRequired,
   duration: PropTypes.number.isRequired,
   title: PropTypes.string.isRequired,
-  logo: PropTypes.string.isRequired,
+  logo: PropTypes.string,
   theme: PropTypes.object.isRequired
 }
 
