@@ -390,7 +390,8 @@ class Video extends Component {
       startTime,
       endTime,
       trimming,
-      disableTimestamps
+      disableTimestamps,
+      disableProgressBar
     } = this.props
 
     const inline = {
@@ -463,6 +464,7 @@ class Video extends Component {
           endTime={!!trimming ? endTime : undefined}
           trimming={trimming}
           disableTimestamps={disableTimestamps}
+          disableProgressBar={disableProgressBar}
         />
       </Animated.View>
     )
