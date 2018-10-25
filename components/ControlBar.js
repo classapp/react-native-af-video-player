@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import { ToggleIcon, Time, Scrubber } from './'
 
@@ -32,7 +32,7 @@ const ControlBar = (props) => {
 
   return (
     <LinearGradient colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.75)']} style={styles.container}>
-      {disableTimestamps ? null : <Time time={currentTime - (startTime || 0)} theme={theme.seconds} />}
+      {disableTimestamps ? <View style={{marginLeft:5}}/> : <Time time={currentTime - (startTime || 0)} theme={theme.seconds} />}
       <Scrubber
         onSeek={pos => onSeek(!!trimming ? (((pos * (endTime - startTime)) + startTime) / duration) : pos)}
         onSeekRelease={pos => onSeekRelease(!!trimming ? (((pos * (endTime - startTime)) + startTime) / duration) : pos)}
@@ -48,7 +48,7 @@ const ControlBar = (props) => {
         iconOn="volume-mute"
         size={20}
       />
-      {disableTimestamps ? null : <Time time={!!trimming ? (endTime - startTime) : duration} theme={theme.duration} />}
+      {disableTimestamps ?<View style={{marginRight:5}}/>  : <Time time={!!trimming ? (endTime - startTime) : duration} theme={theme.duration} />}
       {!inlineOnly &&
         <ToggleIcon
           paddingRight
