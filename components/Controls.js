@@ -130,7 +130,7 @@ class Controls extends Component {
       inlineOnly,
       startTime,
       endTime,
-      trimming
+      trimming,
       disableTimestamps
     } = this.props
 
