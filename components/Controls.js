@@ -131,6 +131,7 @@ class Controls extends Component {
       startTime,
       endTime,
       trimming
+      disableTimestamps
     } = this.props
 
     const { center, ...controlBar } = theme
@@ -170,6 +171,7 @@ class Controls extends Component {
             startTime={!!trimming ? startTime : undefined}
             endTime={!!trimming ? endTime : undefined}
             trimming={trimming}
+            disableTimestamps={disableTimestamps}
           />
         </Animated.View>
       </Touchable>

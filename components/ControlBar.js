@@ -26,15 +26,16 @@ const ControlBar = (props) => {
     inlineOnly,
     startTime,
     endTime,
-    trimming
+    trimming,
+    disableTimestamps
   } = props
 
   return (
     <LinearGradient colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.75)']} style={styles.container}>
-      <Time time={currentTime - (startTime || 0)} theme={theme.seconds} />
+      {disableTimestamps ? null : <Time time={currentTime - (startTime || 0)} theme={theme.seconds} />}
       <Scrubber
-        onSeek={pos => onSeek(!!trimming ? (((pos * (endTime - startTime)) + startTime) / duration): pos)}
-        onSeekRelease={pos => onSeekRelease(!!trimming ? (((pos * (endTime - startTime)) + startTime) / duration): pos)}
+        onSeek={pos => onSeek(!!trimming ? (((pos * (endTime - startTime)) + startTime) / duration) : pos)}
+        onSeekRelease={pos => onSeekRelease(!!trimming ? (((pos * (endTime - startTime)) + startTime) / duration) : pos)}
         progress={progress}
         theme={{ scrubberThumb: theme.scrubberThumb, scrubberBar: theme.scrubberBar }}
       />
@@ -47,7 +48,7 @@ const ControlBar = (props) => {
         iconOn="volume-mute"
         size={20}
       />
-      <Time time={!!trimming ? (endTime - startTime) : duration} theme={theme.duration} />
+      {disableTimestamps ? null : <Time time={!!trimming ? (endTime - startTime) : duration} theme={theme.duration} />}
       {!inlineOnly &&
         <ToggleIcon
           paddingRight

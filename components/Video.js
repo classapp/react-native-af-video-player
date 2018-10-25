@@ -390,6 +390,7 @@ class Video extends Component {
       startTime,
       endTime,
       trimming,
+      disableTimestamps
     } = this.props
 
     const inline = {
@@ -461,6 +462,7 @@ class Video extends Component {
           startTime={!!trimming ? startTime : undefined}
           endTime={!!trimming ? endTime : undefined}
           trimming={trimming}
+          disableTimestamps={disableTimestamps}
         />
       </Animated.View>
     )
@@ -513,6 +515,7 @@ Video.propTypes = {
   theme: PropTypes.object,
   resizeMode: PropTypes.string,
   trimming: PropTypes.bool,
+  disableTimestamps: PropTypes.bool,
 }
 
 Video.defaultProps = {
@@ -528,6 +531,7 @@ Video.defaultProps = {
   rotateToFullScreen: false,
   lockPortraitOnFsExit: false,
   trimming: undefined,
+  disableTimestamps: false,
   onEnd: () => { },
   onLoad: () => { },
   onPlay: () => { },
@@ -542,7 +546,7 @@ Video.defaultProps = {
   logo: undefined,
   title: '',
   theme: defaultTheme,
-  resizeMode: 'contain'
+  resizeMode: 'contain',
 }
 
 export default Video
