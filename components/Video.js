@@ -56,7 +56,7 @@ class Video extends Component {
     super(props)
     this.state = {
       paused: !props.autoPlay,
-      muted: false,
+      muted: props.muted || false,
       fullScreen: false,
       inlineHeight: Win.width * 0.5625,
       loading: false,
@@ -518,6 +518,7 @@ Video.propTypes = {
   resizeMode: PropTypes.string,
   trimming: PropTypes.bool,
   disableTimestamps: PropTypes.bool,
+  muted: PropTypes.bool,
 }
 
 Video.defaultProps = {
@@ -534,6 +535,7 @@ Video.defaultProps = {
   lockPortraitOnFsExit: false,
   trimming: undefined,
   disableTimestamps: false,
+  muted: false,
   onEnd: () => { },
   onLoad: () => { },
   onPlay: () => { },
