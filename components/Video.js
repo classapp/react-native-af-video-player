@@ -56,7 +56,7 @@ class Video extends Component {
     super(props)
     this.state = {
       paused: !props.autoPlay,
-      muted: props.muted || false,
+      muted: false,
       fullScreen: false,
       inlineHeight: Win.width * 0.5625,
       loading: false,
@@ -155,7 +155,8 @@ class Video extends Component {
 
   onRotated({ window: { width, height } }) {
     // Add this condition incase if inline and fullscreen options are turned on
-    if (this.props.inlineOnly) return
+    // if (this.props.inlineOnly) return
+
     const orientation = width > height ? 'LANDSCAPE' : 'PORTRAIT'
     if (this.props.rotateToFullScreen) {
       if (orientation === 'LANDSCAPE') {
@@ -390,8 +391,6 @@ class Video extends Component {
       startTime,
       endTime,
       trimming,
-      disableTimestamps,
-      disableProgressBar
     } = this.props
 
     const inline = {
@@ -463,8 +462,6 @@ class Video extends Component {
           startTime={!!trimming ? startTime : undefined}
           endTime={!!trimming ? endTime : undefined}
           trimming={trimming}
-          disableTimestamps={disableTimestamps}
-          disableProgressBar={disableProgressBar}
         />
       </Animated.View>
     )
@@ -517,8 +514,6 @@ Video.propTypes = {
   theme: PropTypes.object,
   resizeMode: PropTypes.string,
   trimming: PropTypes.bool,
-  disableTimestamps: PropTypes.bool,
-  muted: PropTypes.bool,
 }
 
 Video.defaultProps = {
@@ -534,8 +529,6 @@ Video.defaultProps = {
   rotateToFullScreen: false,
   lockPortraitOnFsExit: false,
   trimming: undefined,
-  disableTimestamps: false,
-  muted: false,
   onEnd: () => { },
   onLoad: () => { },
   onPlay: () => { },
@@ -550,7 +543,7 @@ Video.defaultProps = {
   logo: undefined,
   title: '',
   theme: defaultTheme,
-  resizeMode: 'contain',
+  resizeMode: 'contain'
 }
 
 export default Video
