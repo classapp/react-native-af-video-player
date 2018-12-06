@@ -56,7 +56,7 @@ class Video extends Component {
     super(props)
     this.state = {
       paused: !props.autoPlay,
-      muted: false,
+      muted: props.muted || false,
       fullScreen: false,
       inlineHeight: Win.width * 0.5625,
       loading: false,
@@ -391,6 +391,8 @@ class Video extends Component {
       startTime,
       endTime,
       trimming,
+      disableTimestamps,
+      disableProgressBar
     } = this.props
 
     const inline = {
@@ -462,6 +464,8 @@ class Video extends Component {
           startTime={!!trimming ? startTime : undefined}
           endTime={!!trimming ? endTime : undefined}
           trimming={trimming}
+          disableTimestamps={disableTimestamps}
+          disableProgressBar={disableProgressBar}
         />
       </Animated.View>
     )
@@ -514,6 +518,8 @@ Video.propTypes = {
   theme: PropTypes.object,
   resizeMode: PropTypes.string,
   trimming: PropTypes.bool,
+  disableTimestamps: PropTypes.bool,
+  muted: PropTypes.bool,
 }
 
 Video.defaultProps = {
@@ -529,6 +535,8 @@ Video.defaultProps = {
   rotateToFullScreen: false,
   lockPortraitOnFsExit: false,
   trimming: undefined,
+  disableTimestamps: false,
+  muted: false,
   onEnd: () => { },
   onLoad: () => { },
   onPlay: () => { },
@@ -544,6 +552,7 @@ Video.defaultProps = {
   title: '',
   theme: defaultTheme,
   resizeMode: 'contain'
+
 }
 
 export default Video
