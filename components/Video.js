@@ -57,7 +57,7 @@ class Video extends Component {
     this.state = {
       paused: !props.autoPlay,
       muted: props.muted || false,
-      fullScreen: false,
+      fullScreen: this.props.fullScreen || false,
       inlineHeight: Win.width * 0.5625,
       loading: false,
       duration: 0,
