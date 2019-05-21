@@ -392,7 +392,8 @@ class Video extends Component {
       endTime,
       trimming,
       disableTimestamps,
-      disableProgressBar
+      disableProgressBar,
+      hideStatusBar
     } = this.props
 
     const inline = {
@@ -415,7 +416,7 @@ class Video extends Component {
           fullScreen ? null : style
         ]}
       >
-        <StatusBar hidden={fullScreen} />
+        <StatusBar hidden={fullScreen || hideStatusBar} />
         {
           ((loading && placeholder) || currentTime < 0.01) &&
           <Image resizeMode="cover" style={styles.image} {...checkSource(placeholder)} />
@@ -552,8 +553,8 @@ Video.defaultProps = {
   logo: undefined,
   title: '',
   theme: defaultTheme,
-  resizeMode: 'contain'
-
+  resizeMode: 'contain',
+  hideStatusBar: false,
 }
 
 export default Video
