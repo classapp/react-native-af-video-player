@@ -54,11 +54,12 @@ const defaultTheme = {
 class Video extends Component {
   constructor(props) {
     super(props)
+    const inlineHeight = props.style.height || Win.width * 0.5625
     this.state = {
       paused: !props.autoPlay,
       muted: props.muted || false,
       fullScreen: this.props.fullScreen || false,
-      inlineHeight: Win.width * 0.5625,
+      inlineHeight,
       loading: false,
       duration: 0,
       progress: 0,
@@ -66,8 +67,8 @@ class Video extends Component {
       seeking: false,
       renderError: false
     }
-    this.animInline = new Animated.Value(Win.width * 0.5625)
-    this.animFullscreen = new Animated.Value(Win.width * 0.5625)
+    this.animInline = new Animated.Value(inlineHeight)
+    this.animFullscreen = new Animated.Value(inlineHeight)
     this.BackHandler = this.BackHandler.bind(this)
     this.onRotated = this.onRotated.bind(this)
   }
@@ -112,9 +113,9 @@ class Video extends Component {
     const { height, width } = data.naturalSize
     const ratio = height === 'undefined' && width === 'undefined' ?
       (9 / 16) : (height / width)
-    const inlineHeight = this.props.lockRatio ?
+    const inlineHeight = this.props.style ? this.props.style.height : (this.props.lockRatio ?
       (Win.width / this.props.lockRatio)
-      : (Win.width * ratio)
+      : (Win.width * ratio))
     this.setState({
       paused: !this.props.autoPlay,
       loading: false,
