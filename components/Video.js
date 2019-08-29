@@ -189,7 +189,7 @@ class Video extends Component {
 
     this.setState({ seeking: false }, () => {
       this.progress({ currentTime: Math.max(0, seconds) })
-      this.player.seek(seconds)
+      this.player.seek({time: seconds, tolerance: 1});
     })
   }
 
