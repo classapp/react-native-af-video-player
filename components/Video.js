@@ -8,7 +8,8 @@ import {
   BackHandler,
   Animated,
   Image,
-  Alert
+  Alert,
+  Platform
 } from 'react-native'
 import VideoPlayer from 'react-native-video'
 import KeepAwake from 'react-native-keep-awake'
@@ -189,7 +190,11 @@ class Video extends Component {
 
     this.setState({ seeking: false }, () => {
       this.progress({ currentTime: Math.max(0, seconds) })
-      this.player.seek({time: seconds, tolerance: 1});
+      if (Platform.OS === 'ios') { 
+        this.player.seek({time: seconds, tolerance: 1});
+      } else {
+        this.player.seek(seconds);
+      }
     })
   }
 
