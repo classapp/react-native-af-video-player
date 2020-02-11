@@ -86,7 +86,7 @@ class Video extends Component {
 
   componentDidUpdate(prevProps) {
     const {
-      trimming, startTime, endTime,
+      trimming, startTime, endTime
     } = this.props;
 
     const { currentTime, duration } = this.state;
@@ -102,6 +102,8 @@ class Video extends Component {
       }
       this.onSeekRelease(seek);
     }
+
+    if(this.props.style.height !== this.state.inlineHeight) this.setState({ inlineHeight: this.props.style.height }) /* Update the inlineHeight */
   }
 
   onLoadStart() {
@@ -158,9 +160,11 @@ class Video extends Component {
   onRotated({ window: { width, height } }) {
     // Add this condition incase if inline and fullscreen options are turned on
     // if (this.props.inlineOnly) return
+    
 
     const orientation = width > height ? 'LANDSCAPE' : 'PORTRAIT'
     if (this.props.rotateToFullScreen) {
+
       if (orientation === 'LANDSCAPE') {
         this.setState({ fullScreen: true }, () => {
           this.animToFullscreen(height)
