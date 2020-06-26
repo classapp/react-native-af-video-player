@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import { ToggleIcon, Time, Scrubber } from './'
 
@@ -24,18 +24,23 @@ const ControlBar = (props) => {
     fullscreen,
     theme,
     inlineOnly,
-    hideFullScreenControl
+    hideFullScreenControl,
+    startTime,
+    endTime,
+    trimming,
+    disableTimestamps,
+    disableProgressBar
   } = props
 
   return (
     <LinearGradient colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.75)']} style={styles.container}>
-      <Time time={currentTime} theme={theme.seconds} />
-      <Scrubber
-        onSeek={pos => onSeek(pos)}
-        onSeekRelease={pos => onSeekRelease(pos)}
+      {disableTimestamps ? <View style={{ marginLeft: 5 }} /> : <Time time={currentTime - (startTime || 0)} theme={theme.seconds} />}
+      {disableProgressBar ? null : <Scrubber
+        onSeek={pos => onSeek(!!trimming ? (((pos * (endTime - startTime)) + startTime) / duration) : pos)}
+        onSeekRelease={pos => onSeekRelease(!!trimming ? (((pos * (endTime - startTime)) + startTime) / duration) : pos)}
         progress={progress}
         theme={{ scrubberThumb: theme.scrubberThumb, scrubberBar: theme.scrubberBar }}
-      />
+      />}
       <ToggleIcon
         paddingLeft
         theme={theme.volume}
@@ -45,16 +50,16 @@ const ControlBar = (props) => {
         iconOn="volume-mute"
         size={20}
       />
-      <Time time={duration} theme={theme.duration} />
-      { !inlineOnly || !hideFullScreenControl &&
-      <ToggleIcon
-        paddingRight
-        onPress={() => props.toggleFS()}
-        iconOff="fullscreen"
-        iconOn="fullscreen-exit"
-        isOn={fullscreen}
-        theme={theme.fullscreen}
-      />}
+      {disableTimestamps ? <View style={{ marginRight: 5 }} /> : <Time time={!!trimming ? (endTime - startTime) : duration} theme={theme.duration} />}
+      {!inlineOnly || !hideFullScreenControl &&
+        <ToggleIcon
+          paddingRight
+          onPress={() => props.toggleFS()}
+          iconOff="fullscreen"
+          iconOn="fullscreen-exit"
+          isOn={fullscreen}
+          theme={theme.fullscreen}
+        />}
     </LinearGradient>
   )
 }

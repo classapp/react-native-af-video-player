@@ -128,7 +128,12 @@ class Controls extends Component {
       duration,
       theme,
       inlineOnly,
-      hideFullScreenControl
+      hideFullScreenControl,
+      startTime,
+      endTime,
+      trimming,
+      disableTimestamps,
+      disableProgressBar
     } = this.props
 
     const { center, ...controlBar } = theme
@@ -166,6 +171,11 @@ class Controls extends Component {
             theme={controlBar}
             inlineOnly={inlineOnly}
             hideFullScreenControl={hideFullScreenControl}
+            startTime={!!trimming ? startTime : undefined}
+            endTime={!!trimming ? endTime : undefined}
+            trimming={trimming}
+            disableTimestamps={disableTimestamps}
+            disableProgressBar={disableProgressBar}
           />
         </Animated.View>
       </Touchable>
@@ -199,7 +209,7 @@ Controls.propTypes = {
   currentTime: PropTypes.number.isRequired,
   duration: PropTypes.number.isRequired,
   title: PropTypes.string.isRequired,
-  logo: PropTypes.string.isRequired,
+  logo: PropTypes.string,
   theme: PropTypes.object.isRequired
 }
 
