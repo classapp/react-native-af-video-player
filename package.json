@@ -1,5 +1,5 @@
 {
-  "name": "react-native-af-video-player-updated",
+  "name": "react-native-af-video-player",
   "version": "0.2.3",
   "dependencies": {
     "react-native-keep-awake": "^4.0.0",
