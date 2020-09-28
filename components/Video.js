@@ -8,8 +8,7 @@ import {
   BackHandler,
   Animated,
   Image,
-  Alert,
-  Platform
+  Alert
 } from 'react-native'
 import VideoPlayer from 'react-native-video'
 import KeepAwake from 'react-native-keep-awake'
@@ -55,12 +54,11 @@ const defaultTheme = {
 class Video extends Component {
   constructor(props) {
     super(props)
-    const inlineHeight = props.style.height || Win.width * 0.5625
     this.state = {
       paused: !props.autoPlay,
-      muted: props.muted || false,
-      fullScreen: this.props.fullScreen || false,
-      inlineHeight,
+      muted: false,
+      fullScreen: false,
+      inlineHeight: Win.width * 0.5625,
       loading: false,
       duration: 0,
       progress: 0,
@@ -68,8 +66,8 @@ class Video extends Component {
       seeking: false,
       renderError: false
     }
-    this.animInline = new Animated.Value(inlineHeight)
-    this.animFullscreen = new Animated.Value(inlineHeight)
+    this.animInline = new Animated.Value(Win.width * 0.5625)
+    this.animFullscreen = new Animated.Value(Win.width * 0.5625)
     this.BackHandler = this.BackHandler.bind(this)
     this.onRotated = this.onRotated.bind(this)
   }
@@ -116,15 +114,16 @@ class Video extends Component {
     const { height, width } = data.naturalSize
     const ratio = height === 'undefined' && width === 'undefined' ?
       (9 / 16) : (height / width)
-    const inlineHeight = this.props.style ? this.props.style.height : (this.props.lockRatio ?
+    const inlineHeight = this.props.lockRatio ?
       (Win.width / this.props.lockRatio)
-      : (Win.width * ratio))
+      : (Win.width * ratio)
     this.setState({
       paused: !this.props.autoPlay,
       loading: false,
       inlineHeight,
       duration: data.duration
     }, () => {
+      this.onSeekRelease(data.currentTime);
       Animated.timing(this.animInline, { toValue: inlineHeight, duration: 200 }).start()
       this.props.onPlay(!this.state.paused)
       if (!this.state.paused) {
@@ -147,24 +146,19 @@ class Video extends Component {
 
   onEnd() {
     this.props.onEnd()
-    const { loop, startTime, trimming } = this.props
-    const { duration } = this.state;
-
+    const { loop } = this.props
     if (!loop) this.pause()
-    this.onSeekRelease(!!trimming ? (startTime / duration) : 0)
-    this.setState({ currentTime: !!trimming ? startTime : 0 }, () => {
+    this.onSeekRelease(0)
+    this.setState({ currentTime: 0 }, () => {
       if (!loop) this.controls.showControls()
     })
   }
 
   onRotated({ window: { width, height } }) {
     // Add this condition incase if inline and fullscreen options are turned on
-    // if (this.props.inlineOnly) return
-    
-
+    if (this.props.inlineOnly) return
     const orientation = width > height ? 'LANDSCAPE' : 'PORTRAIT'
     if (this.props.rotateToFullScreen) {
-
       if (orientation === 'LANDSCAPE') {
         this.setState({ fullScreen: true }, () => {
           this.animToFullscreen(height)
@@ -191,7 +185,6 @@ class Video extends Component {
 
   onSeekRelease(percent) {
     const seconds = percent * this.state.duration
-
     this.setState({ seeking: false }, () => {
       this.progress({ currentTime: Math.max(0, seconds) })
       if (Platform.OS === 'ios') { 
@@ -204,22 +197,22 @@ class Video extends Component {
 
   onError(msg) {
     this.props.onError(msg)
-    // const { error } = this.props
-    // this.setState({ renderError: true }, () => {
-    //   let type
-    //   switch (true) {
-    //     case error === false:
-    //       type = error
-    //       break
-    //     case typeof error === 'object':
-    //       type = Alert.alert(error.title, error.message, error.button, error.options)
-    //       break
-    //     default:
-    //       type = Alert.alert('Oops!', 'There was an error playing this video, please try again later.', [{ text: 'Close' }])
-    //       break
-    //   }
-    //   return type
-    // })
+    const { error } = this.props
+    this.setState({ renderError: true }, () => {
+      let type
+      switch (true) {
+        case error === false:
+          type = error
+          break
+        case typeof error === 'object':
+          type = Alert.alert(error.title, error.message, error.button, error.options)
+          break
+        default:
+          type = Alert.alert('Oops!', 'There was an error playing this video, please try again later.', [{ text: 'Close' }])
+          break
+      }
+      return type
+    })
   }
 
   BackHandler() {
@@ -315,7 +308,7 @@ class Video extends Component {
   }
 
   seek(percent) {
-    const currentTime = (percent * this.state.duration)
+    const currentTime = percent * this.state.duration
     this.setState({ seeking: true, currentTime })
   }
 
@@ -330,17 +323,7 @@ class Video extends Component {
 
   progress(time) {
     const { currentTime } = time
-    const { trimming, startTime, endTime } = this.props;
-    const { duration } = this.state
-
-    const ratio = !!trimming ? ((currentTime - startTime) / (endTime - startTime)) : (currentTime / duration);
-    const progress = Math.max(0, ratio);
-
-    if (!!trimming && (currentTime >= endTime)) {
-      this.onEnd()
-      return
-    }
-
+    const progress = currentTime / this.state.duration
     if (!this.state.seeking) {
       this.setState({ progress, currentTime }, () => {
         this.props.onProgress(time)
@@ -398,12 +381,8 @@ class Video extends Component {
       inlineOnly,
       playInBackground,
       playWhenInactive,
-      startTime,
-      endTime,
-      trimming,
-      disableTimestamps,
-      disableProgressBar,
-      hideStatusBar
+      controlDuration,
+      hideFullScreenControl
     } = this.props
 
     const inline = {
@@ -426,7 +405,7 @@ class Video extends Component {
           fullScreen ? null : style
         ]}
       >
-        <StatusBar hidden={fullScreen || hideStatusBar} />
+        <StatusBar hidden={fullScreen} />
         {
           ((loading && placeholder) || currentTime < 0.01) &&
           <Image resizeMode="cover" style={styles.image} {...checkSource(placeholder)} />
@@ -451,7 +430,6 @@ class Video extends Component {
           onError={e => this.onError(e)}
           // onBuffer={() => this.onBuffer()} // Callback when remote video is buffering
           onTimedMetadata={e => onTimedMetadata(e)} // Callback when the stream receive some metadata
-          ignoreSilentSwitch="ignore"
         />
         <Controls
           ref={(ref) => { this.controls = ref }}
@@ -473,11 +451,8 @@ class Video extends Component {
           onMorePress={() => onMorePress()}
           theme={setTheme}
           inlineOnly={inlineOnly}
-          startTime={!!trimming ? startTime : undefined}
-          endTime={!!trimming ? endTime : undefined}
-          trimming={trimming}
-          disableTimestamps={disableTimestamps}
-          disableProgressBar={disableProgressBar}
+          controlDuration={controlDuration}
+          hideFullScreenControl={hideFullScreenControl}
         />
       </Animated.View>
     )
@@ -509,6 +484,7 @@ Video.propTypes = {
   loop: PropTypes.bool,
   autoPlay: PropTypes.bool,
   inlineOnly: PropTypes.bool,
+  hideFullScreenControl: PropTypes.bool,
   fullScreenOnly: PropTypes.bool,
   playInBackground: PropTypes.bool,
   playWhenInactive: PropTypes.bool,
@@ -529,9 +505,7 @@ Video.propTypes = {
   title: PropTypes.string,
   theme: PropTypes.object,
   resizeMode: PropTypes.string,
-  trimming: PropTypes.bool,
-  disableTimestamps: PropTypes.bool,
-  muted: PropTypes.bool,
+  controlDuration: PropTypes.number,
 }
 
 Video.defaultProps = {
@@ -546,17 +520,14 @@ Video.defaultProps = {
   playWhenInactive: false,
   rotateToFullScreen: false,
   lockPortraitOnFsExit: false,
-  trimming: undefined,
-  disableTimestamps: false,
-  muted: false,
-  onEnd: () => { },
-  onLoad: () => { },
-  onPlay: () => { },
-  onError: () => { },
-  onProgress: () => { },
+  onEnd: () => {},
+  onLoad: () => {},
+  onPlay: () => {},
+  onError: () => {},
+  onProgress: () => {},
   onMorePress: undefined,
-  onFullScreen: () => { },
-  onTimedMetadata: () => { },
+  onFullScreen: () => {},
+  onTimedMetadata: () => {},
   rate: 1,
   volume: 1,
   lockRatio: undefined,
@@ -564,7 +535,7 @@ Video.defaultProps = {
   title: '',
   theme: defaultTheme,
   resizeMode: 'contain',
-  hideStatusBar: false,
+  controlDuration: 3,
 }
 
 export default Video
