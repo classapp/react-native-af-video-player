@@ -54,8 +54,10 @@ const defaultTheme = {
 
 class Video extends Component {
   constructor(props) {
-    super(props)
-    const inlineHeight = props.style.height || Win.width * 0.5625
+    super(props);
+
+    const inlineHeight = props.style.height || Win.width * 0.5625;
+
     this.state = {
       paused: !props.autoPlay,
       muted: props.muted || false,
@@ -116,9 +118,10 @@ class Video extends Component {
     const { height, width } = data.naturalSize
     const ratio = height === 'undefined' && width === 'undefined' ?
       (9 / 16) : (height / width)
-    const inlineHeight = this.props.style ? this.props.style.height : (this.props.lockRatio ?
-      (Win.width / this.props.lockRatio)
-      : (Win.width * ratio))
+      console.log(data);
+
+
+    const inlineHeight = (Win.width * ratio);
     this.setState({
       paused: !this.props.autoPlay,
       loading: false,
@@ -403,7 +406,7 @@ class Video extends Component {
     } = this.props
 
     const inline = {
-      height: inlineHeight,
+      height: '100%',
       alignSelf: 'stretch'
     }
 
@@ -420,7 +423,7 @@ class Video extends Component {
             (styles.fullScreen, { height: this.animFullscreen })
             : { height: this.animInline },
           fullScreen ? null : style
-        ]}
+        , { height: '100%' }]}
       >
         <StatusBar hidden={fullScreen || hideStatusBar} />
         {
